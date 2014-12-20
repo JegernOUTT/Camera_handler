@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -146,7 +146,7 @@ public class MainActivity extends ActionBarActivity {
 
     public void application_resolve(View v)
     {
-    /*   PackageManager packageManager = getPackageManager();
+       PackageManager packageManager = getPackageManager();
         List<ApplicationInfo> applicationInfos = packageManager.getInstalledApplications(0);
 
         for (int i = 0; i<applicationInfos.size();i++)
@@ -157,14 +157,7 @@ public class MainActivity extends ActionBarActivity {
                 textView.append(applicationInfos.get(i).permission);
         }
 
-        */
-        Intent intent = new Intent("android.settings.APP_OPS_SETTINGS");
-        try {
-            startActivity(intent);
-        } catch (Exception e) {
-            // Cannot launch activity !
-            textView.append("Cannot start");
-        }
+
 
 
     }
