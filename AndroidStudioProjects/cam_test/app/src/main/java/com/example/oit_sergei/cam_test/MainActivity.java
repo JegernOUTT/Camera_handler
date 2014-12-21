@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -148,13 +149,40 @@ public class MainActivity extends ActionBarActivity {
     {
        PackageManager packageManager = getPackageManager();
         List<ApplicationInfo> applicationInfos = packageManager.getInstalledApplications(0);
+        List<PackageInfo> packageInfos = packageManager.getInstalledPackages(4096);
 
+
+/*
         for (int i = 0; i<applicationInfos.size();i++)
         {
-            textView.append(applicationInfos.get(i).toString());
-            applicationInfos.get(i).describeContents();
             if (applicationInfos.get(i).permission != null)
-                textView.append(applicationInfos.get(i).permission);
+            {
+                textView.append(applicationInfos.get(i).permission.toString());
+                textView.append(applicationInfos.get(i).toString());
+            }
+
+        }
+*/
+//        textView.append("\n           ");
+    //    PermissionInfo permissionInfo = new PermissionInfo();
+
+        for (int i = 0; i < packageInfos.size();i++)
+        {
+            textView.append("\n\n");
+            textView.append(packageInfos.get(i).toString());
+            textView.append("\n");
+
+
+            if (packageInfos.get(i).permissions != null)
+            {
+                for (int j = 0; j < packageInfos.get(i).permissions.length; j++)
+                {
+                    textView.append(packageInfos.get(i).permissions[j].toString());
+                    textView.append("\n");
+                }
+
+            }
+
         }
 
 
