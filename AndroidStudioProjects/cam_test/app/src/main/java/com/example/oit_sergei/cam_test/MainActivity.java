@@ -1,10 +1,10 @@
 package com.example.oit_sergei.cam_test;
 
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -30,6 +31,7 @@ public class MainActivity extends ActionBarActivity {
     private TextView textView;
 
     private Camera camera;
+    String camera_permisson = new String("android.permission.CAMERA");
 
     private AlarmManager alarmManager;
     private PendingIntent alarmIntent;
@@ -147,43 +149,85 @@ public class MainActivity extends ActionBarActivity {
 
     public void application_resolve(View v)
     {
-       PackageManager packageManager = getPackageManager();
-        List<ApplicationInfo> applicationInfos = packageManager.getInstalledApplications(0);
+        PackageManager packageManager = getPackageManager();
         List<PackageInfo> packageInfos = packageManager.getInstalledPackages(4096);
 
+        int flag = 0;
+        int run_index = 0;
 
-/*
-        for (int i = 0; i<applicationInfos.size();i++)
+        ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+
+        //Создание контейнеров для running processes и running services
+        List <ActivityManager.RunningAppProcessInfo> runningAppProcessInfos = activityManager.getRunningAppProcesses();
+        List <ActivityManager.RunningServiceInfo> runningServiceInfos = activityManager.getRunningServices(Integer.MAX_VALUE);
+
+        //Создание контейнеров для отсеяных по camera permission processes и services
+        List <PackageInfo> packageInfos_running = new ArrayList<>();
+        List <ActivityManager.RunningAppProcessInfo> RunningAppProcessInfo_checked = new ArrayList<>();
+        List <ActivityManager.RunningServiceInfo> runningServiceInfos_checked = new ArrayList<>();
+
+
+        //Проверка Running Tasks для финального отбора activity
+        List <ActivityManager.RunningTaskInfo> runningTaskInfos = activityManager.getRunningTasks(Integer.MAX_VALUE);
+
+
+
+
+        //Отсеивание всех запущенных активити по camera permission
+        for (int i = 0; i < runningAppProcessInfos.size(); i++)
         {
-            if (applicationInfos.get(i).permission != null)
+            for (int j = 0; j < packageInfos.size(); j++)
             {
-                textView.append(applicationInfos.get(i).permission.toString());
-                textView.append(applicationInfos.get(i).toString());
-            }
+                flag = 0;
 
-        }
-*/
-//        textView.append("\n           ");
-    //    PermissionInfo permissionInfo = new PermissionInfo();
-
-        for (int i = 0; i < packageInfos.size();i++)
-        {
-            textView.append("\n\n");
-            textView.append(packageInfos.get(i).toString());
-            textView.append("\n");
-
-
-            if (packageInfos.get(i).permissions != null)
-            {
-                for (int j = 0; j < packageInfos.get(i).permissions.length; j++)
+                if (runningAppProcessInfos.get(i).processName.equals(packageInfos.get(j).applicationInfo.processName) && packageInfos.get(j).requestedPermissions != null)
                 {
-                    textView.append(packageInfos.get(i).permissions[j].toString());
-                    textView.append("\n");
+                    for (int k = 0; k < packageInfos.get(j).requestedPermissions.length; k++)
+                    {
+                        if (packageInfos.get(j).requestedPermissions[k].toString().equals(camera_permisson))
+                        {
+                            flag = 1;
+                        }
+                    }
                 }
 
+                if (flag == 1)
+                {
+                    packageInfos_running.add(run_index, packageInfos.get(j));
+                    RunningAppProcessInfo_checked.add(run_index, runningAppProcessInfos.get(i));
+                    run_index++;
+                }
             }
-
         }
+
+
+        //Отсеивание всех запущенных сервисов по camera permission
+        run_index = 0;
+        for (int i = 0; i < packageInfos_running.size(); i++)
+        {
+            for (int j = 0; j < runningServiceInfos.size(); j++)
+            {
+                flag = 0;
+
+                if (packageInfos_running.get(i).applicationInfo.processName.equals(runningServiceInfos.get(j).process))
+                {
+                    flag = 1;
+                }
+
+                if (flag == 1)
+                {
+                    runningServiceInfos_checked.add(run_index, runningServiceInfos.get(j));
+                    run_index++;
+                }
+            }
+        }
+
+        for (int i = 0; i < runningServiceInfos_checked.size(); i++)
+        {
+            textView.append(runningServiceInfos_checked.get(i).process);
+            textView.append("\n");
+        }
+
 
 
 
