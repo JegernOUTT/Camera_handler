@@ -5,9 +5,19 @@
     <uses-sdk android:minSdkVersion="17" />
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
 
     <uses-feature android:name="android.hardware.camera" />
 
+    <android:uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <android:uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
 
     <application
         android:allowBackup="true"
@@ -29,7 +39,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".toast_pressed_activity"
+            android:label="@string/title_activity_toast_pressed_activity" >
+        </activity>
+        <activity
+            android:name=".black_list_activity"
+            android:label="@string/title_activity_black_list_activity" >
+        </activity>
+        <activity
+            android:name=".white_list_activity"
+            android:label="@string/title_activity_white_list_activity" >
+        </activity>
     </application>
 
 </manifest>

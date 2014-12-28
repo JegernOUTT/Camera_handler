@@ -1,10 +1,11 @@
 package com.example.oit_sergei.cam_test;
 
-import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
@@ -17,68 +18,81 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.StringTokenizer;
 
 
 public class MainActivity extends ActionBarActivity {
 
     private Button start;
     private Button stop;
-    private Button startCamera;
-    private Button stopCamera;
-    private Button applications_btn;
+    private Button blockCamera;
+    private Button unlockCamera;
+
     private TextView textView;
+    public static final String PARAM_PINTENT = "pendingIntent";
+    public final static String PARAM_RESULT = "result";
+    private PackageInfo camera_blocked_pack;
 
     private Camera camera;
-    String camera_permisson = new String("android.permission.CAMERA");
 
     private AlarmManager alarmManager;
     private PendingIntent alarmIntent;
 
     private Intent intentToFire;
-    long time = 10000;
+    long time = 1000;
     private int alarmType;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        start = (Button) findViewById(R.id.button);
-        stop = (Button) findViewById(R.id.button2);
-        startCamera = (Button) findViewById(R.id.button4);
-        stopCamera = (Button) findViewById(R.id.button5);
-        applications_btn = (Button) findViewById(R.id.button3);
-        textView = (TextView) findViewById(R.id.textView);
-
+        start = (Button) findViewById(R.id.start_cam_btn);
+        stop = (Button) findViewById(R.id.stop_cam_btn);
+        blockCamera = (Button) findViewById(R.id.block_cam_btn);
+        unlockCamera = (Button) findViewById(R.id.unlock_cam_btn);
 
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         intentToFire = new Intent(this, MyService.class);
-        alarmIntent = PendingIntent.getService(this, 0, intentToFire, 0);
+
+        alarmType = AlarmManager.ELAPSED_REALTIME;
+
+        registerReceiver(app_get, new IntentFilter("Camera_unavailable"));
     }
 
     public void onStartClick(View v)
     {
-        alarmType = AlarmManager.ELAPSED_REALTIME;
+        alarmIntent = PendingIntent.getService(this, 0, intentToFire, 0);
         alarmManager.setInexactRepeating(alarmType, time, time, alarmIntent);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Toast.makeText(getApplicationContext(), "GOOD NEWS", Toast.LENGTH_SHORT).show();
+
     }
 
     public void onStopClick(View v)
     {
         try {
-            stopService(intentToFire);
+            stopService(new Intent(this, MyService.class));
+            alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(alarmIntent);
+            Toast.makeText(this, "Service closed", Toast.LENGTH_SHORT).show();
         } catch (RuntimeException re)
         {
-            Toast.makeText(this, "Невозможно закрыть сервис. Нулевой указатель",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Can not close the service",Toast.LENGTH_SHORT).show();
         }
-        alarmManager.cancel(alarmIntent);
+
     }
 
-    public void onStartCameraClick(View V)
+    public void onBlockCameraClick(View V)
     {
         if (checkCameraHardware(getApplicationContext()) == true)
         {
             camera = getCameraInstance();
+            Toast.makeText(this, "Camera blocked!!!", Toast.LENGTH_SHORT).show();
         } else
             Toast.makeText(this, "Camera Hardware Unavailable",Toast.LENGTH_SHORT).show();
         if (camera == null)
@@ -89,17 +103,34 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
-    public void onStopCameraClick(View V)
+    public void onUnlockCameraClick(View V)
     {
         if (camera != null)
         {
             camera.release();
+            Toast.makeText(this, "Camera unlocked", Toast.LENGTH_SHORT).show();
         }
-
     }
 
 
+    private BroadcastReceiver app_get = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            camera_blocked_pack = intent.getParcelableExtra("App_obj");
+            String cam_app_name = new String(camera_blocked_pack.applicationInfo.processName);
+            int j = 0;
 
+            String szDelimeters = ".";
+            String app_name = new String();
+            StringTokenizer stringTokenizer = new StringTokenizer(camera_blocked_pack.applicationInfo.processName, szDelimeters, true);
+            while (stringTokenizer.hasMoreTokens())
+            {
+                app_name = stringTokenizer.nextToken();
+            }
+
+            Toast.makeText(getApplicationContext(), "Camera is opened in " + app_name + " application. If you want to edit permissions, touch the toast.", Toast.LENGTH_LONG).show();
+        }
+    };
 
     private boolean checkCameraHardware(Context context) {
         if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
@@ -147,92 +178,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
-    public void application_resolve(View v)
-    {
-        PackageManager packageManager = getPackageManager();
-        List<PackageInfo> packageInfos = packageManager.getInstalledPackages(4096);
 
-        int flag = 0;
-        int run_index = 0;
-
-        ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
-
-        //Создание контейнеров для running processes и running services
-        List <ActivityManager.RunningAppProcessInfo> runningAppProcessInfos = activityManager.getRunningAppProcesses();
-        List <ActivityManager.RunningServiceInfo> runningServiceInfos = activityManager.getRunningServices(Integer.MAX_VALUE);
-
-        //Создание контейнеров для отсеяных по camera permission processes и services
-        List <PackageInfo> packageInfos_running = new ArrayList<>();
-        List <ActivityManager.RunningAppProcessInfo> RunningAppProcessInfo_checked = new ArrayList<>();
-        List <ActivityManager.RunningServiceInfo> runningServiceInfos_checked = new ArrayList<>();
-
-
-        //Проверка Running Tasks для финального отбора activity
-        List <ActivityManager.RunningTaskInfo> runningTaskInfos = activityManager.getRunningTasks(Integer.MAX_VALUE);
-
-
-
-
-        //Отсеивание всех запущенных активити по camera permission
-        for (int i = 0; i < runningAppProcessInfos.size(); i++)
-        {
-            for (int j = 0; j < packageInfos.size(); j++)
-            {
-                flag = 0;
-
-                if (runningAppProcessInfos.get(i).processName.equals(packageInfos.get(j).applicationInfo.processName) && packageInfos.get(j).requestedPermissions != null)
-                {
-                    for (int k = 0; k < packageInfos.get(j).requestedPermissions.length; k++)
-                    {
-                        if (packageInfos.get(j).requestedPermissions[k].toString().equals(camera_permisson))
-                        {
-                            flag = 1;
-                        }
-                    }
-                }
-
-                if (flag == 1)
-                {
-                    packageInfos_running.add(run_index, packageInfos.get(j));
-                    RunningAppProcessInfo_checked.add(run_index, runningAppProcessInfos.get(i));
-                    run_index++;
-                }
-            }
-        }
-
-
-        //Отсеивание всех запущенных сервисов по camera permission
-        run_index = 0;
-        for (int i = 0; i < packageInfos_running.size(); i++)
-        {
-            for (int j = 0; j < runningServiceInfos.size(); j++)
-            {
-                flag = 0;
-
-                if (packageInfos_running.get(i).applicationInfo.processName.equals(runningServiceInfos.get(j).process))
-                {
-                    flag = 1;
-                }
-
-                if (flag == 1)
-                {
-                    runningServiceInfos_checked.add(run_index, runningServiceInfos.get(j));
-                    run_index++;
-                }
-            }
-        }
-
-        for (int i = 0; i < runningServiceInfos_checked.size(); i++)
-        {
-            textView.append(runningServiceInfos_checked.get(i).process);
-            textView.append("\n");
-        }
-
-
-
-
-
-    }
 
 
 }
