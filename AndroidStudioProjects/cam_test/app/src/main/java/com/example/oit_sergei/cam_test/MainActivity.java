@@ -10,6 +10,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,7 +19,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.StringTokenizer;
+import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.util.OnClickWrapper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -31,7 +36,7 @@ public class MainActivity extends ActionBarActivity {
     private TextView textView;
     public static final String PARAM_PINTENT = "pendingIntent";
     public final static String PARAM_RESULT = "result";
-    private PackageInfo camera_blocked_pack;
+    private List<PackageInfo> camera_blocked_pack = new ArrayList<>();
 
     private Camera camera;
 
@@ -39,7 +44,7 @@ public class MainActivity extends ActionBarActivity {
     private PendingIntent alarmIntent;
 
     private Intent intentToFire;
-    long time = 1000;
+    long time = 500;
     private int alarmType;
 
 
@@ -64,13 +69,7 @@ public class MainActivity extends ActionBarActivity {
     {
         alarmIntent = PendingIntent.getService(this, 0, intentToFire, 0);
         alarmManager.setInexactRepeating(alarmType, time, time, alarmIntent);
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Toast.makeText(getApplicationContext(), "GOOD NEWS", Toast.LENGTH_SHORT).show();
-
+        Toast.makeText(getApplicationContext(), "Service is starting now...", Toast.LENGTH_SHORT).show();
     }
 
     public void onStopClick(View v)
@@ -79,10 +78,10 @@ public class MainActivity extends ActionBarActivity {
             stopService(new Intent(this, MyService.class));
             alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             alarmManager.cancel(alarmIntent);
-            Toast.makeText(this, "Service closed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Service closed", Toast.LENGTH_SHORT).show();
         } catch (RuntimeException re)
         {
-            Toast.makeText(this, "Can not close the service",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Can not close the service",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -92,12 +91,12 @@ public class MainActivity extends ActionBarActivity {
         if (checkCameraHardware(getApplicationContext()) == true)
         {
             camera = getCameraInstance();
-            Toast.makeText(this, "Camera blocked!!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Camera blocked!!!", Toast.LENGTH_SHORT).show();
         } else
-            Toast.makeText(this, "Camera Hardware Unavailable",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Camera Hardware Unavailable",Toast.LENGTH_SHORT).show();
         if (camera == null)
         {
-            Toast.makeText(this,"Camera Unavailable",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"Camera Unavailable",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -108,7 +107,7 @@ public class MainActivity extends ActionBarActivity {
         if (camera != null)
         {
             camera.release();
-            Toast.makeText(this, "Camera unlocked", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Camera unlocked", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -116,21 +115,39 @@ public class MainActivity extends ActionBarActivity {
     private BroadcastReceiver app_get = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            camera_blocked_pack = intent.getParcelableExtra("App_obj");
-            String cam_app_name = new String(camera_blocked_pack.applicationInfo.processName);
+            PackageInfo temp;
+            temp = intent.getParcelableExtra("App_service");
+            camera_blocked_pack.add(temp);
+            temp = intent.getParcelableExtra("App_activity");
+            camera_blocked_pack.add(temp);
+
+           /* String cam_app_name = new String(camera_blocked_pack.applicationInfo.processName);
             int j = 0;
 
             String szDelimeters = ".";
             String app_name = new String();
+            app_name = camera_blocked_pack.applicationInfo.processName;
             StringTokenizer stringTokenizer = new StringTokenizer(camera_blocked_pack.applicationInfo.processName, szDelimeters, true);
             while (stringTokenizer.hasMoreTokens())
             {
                 app_name = stringTokenizer.nextToken();
-            }
+            }*/
 
-            Toast.makeText(getApplicationContext(), "Camera is opened in " + app_name + " application. If you want to edit permissions, touch the toast.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), camera_blocked_pack.get(0).packageName + "\n" + camera_blocked_pack.get(1).packageName, Toast.LENGTH_LONG).show();
+
+
         }
     };
+
+    OnClickWrapper onClickWrapper = new OnClickWrapper("superactivitytoast", new SuperToast.OnClickListener() {
+        @Override
+        public void onClick(View view, Parcelable parcelable) {
+            Intent intent = new Intent(MainActivity.this, toast_pressed_activity.class);
+            startActivity(intent);
+        }
+    });
+
+
 
     private boolean checkCameraHardware(Context context) {
         if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){

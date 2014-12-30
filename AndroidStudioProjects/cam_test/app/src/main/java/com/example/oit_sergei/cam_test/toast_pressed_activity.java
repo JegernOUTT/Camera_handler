@@ -1,5 +1,10 @@
 package com.example.oit_sergei.cam_test;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -8,10 +13,14 @@ import android.view.MenuItem;
 
 public class toast_pressed_activity extends ActionBarActivity {
 
+    private PackageInfo camera_blocked_pack;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_toast_pressed_activity);
+
+        registerReceiver(app_get, new IntentFilter("Camera_unavailable"));
     }
 
 
@@ -36,4 +45,20 @@ public class toast_pressed_activity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    private BroadcastReceiver app_get = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            camera_blocked_pack = intent.getParcelableExtra("App_obj");
+            String cam_app_name = new String(camera_blocked_pack.applicationInfo.processName);
+            int j = 0;
+
+
+
+
+
+        }
+    };
+
 }

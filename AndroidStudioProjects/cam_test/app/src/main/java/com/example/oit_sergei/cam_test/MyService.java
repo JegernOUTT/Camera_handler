@@ -25,7 +25,9 @@ public class MyService extends Service  {
     private long timer_count;
     private String camera_permisson = new String("android.permission.CAMERA");
     private static int first_cycle_flag;
-    private PackageInfo camera_blocked_pack;
+    private PackageInfo  camera_blocked_pack = new PackageInfo();
+    private PackageInfo result_app_list_service = new PackageInfo();
+    private PackageInfo result_app_list_activity = new PackageInfo();
 
 
     public MyService() {
@@ -40,17 +42,17 @@ public class MyService extends Service  {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-//        Toast.makeText(this, "Start", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "Start", Toast.LENGTH_SHORT).show();
         PendingIntent pendingIntent = intent.getParcelableExtra(MainActivity.PARAM_PINTENT);
 
         cameraCheck = new camera_check();
         int camera_availability = cameraCheck.camera_checking_process();
         if (camera_availability == 0) {
-//            Toast.makeText(this, "Camera opened", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(), "Camera opened", Toast.LENGTH_SHORT).show();
             if (cameraCheck.camera_close() == true) {
-//                Toast.makeText(this, "Camera close OK", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Camera close OK", Toast.LENGTH_SHORT).show();
             } else if (cameraCheck.camera_close() == false) {
-//                Toast.makeText(this, "Camera close ERROR", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Camera close ERROR", Toast.LENGTH_SHORT).show();
             }
             first_cycle_flag = 1;
 
@@ -63,17 +65,20 @@ public class MyService extends Service  {
                 if (camera_blocked_pack != null)
                 {
                     first_cycle_flag = 0;
-                    Intent i = new Intent("Camera_unavailable");
-                    i.putExtra("App_obj", camera_blocked_pack);
+
+                    Intent i = new Intent("Camera_unavailable")
+                            .putExtra("App_service", camera_blocked_pack.get(0))
+                            .putExtra("App_activity", camera_blocked_pack.get(1));
                     sendBroadcast(i);
                     stopSelf();
+
                 }
 
             }
 
 
         } else if (camera_availability == -2) {
-            Toast.makeText(this, "Camera error system", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Camera error system", Toast.LENGTH_SHORT).show();
         }
 //        stopSelf();
 
@@ -91,7 +96,7 @@ public class MyService extends Service  {
         super.onDestroy();
         if (camera != null) {
             camera.release();
-            Toast.makeText(this, "Stopped", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Stopped", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -112,7 +117,7 @@ public class MyService extends Service  {
         return timer_count;
     }
 
-    public PackageInfo application_resolve()
+    public List<PackageInfo> application_resolve()
     {
         PackageManager packageManager = getPackageManager();
         List<PackageInfo> packageInfos = packageManager.getInstalledPackages(4096);
@@ -185,32 +190,50 @@ public class MyService extends Service  {
         //Возврат значений. У сервисов по минимальному времени, у активити по первому в очереди. Если не найдено - возврат null
         if (packageInfos_running != null)
         {
-            return packageInfos_running.get(0);
-        } else if (packageInfos_running == null)
-        {
             if (runningServiceInfos_checked != null)
             {
-                long min_time = runningServiceInfos_checked.get(0).lastActivityTime;
-                int min_i = 0;
+                int my_process = 0;
+
                 for (int i = 1; i < runningServiceInfos_checked.size(); i++)
                 {
-                    if (runningServiceInfos_checked.get(i).lastActivityTime < min_time)
+                    if (runningServiceInfos_checked.get(i).process == "com.example.oit_sergei.cam_test")
                     {
-                        min_time = runningServiceInfos_checked.get(i).lastActivityTime;
+                        my_process = i;
+                    }
+                };
+
+                long min_time = 500;
+                int min_i = 500;
+                for (int i = 1; i < runningServiceInfos_checked.size(); i++)
+                {
+                    if ((Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime) < min_time) && (i != my_process) && (runningServiceInfos_checked.get(i).process != "com.android.phone"))
+                    {
+                        min_time = Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime);
                         min_i = i;
                     }
                 }
 
+                if (min_i == 500)
+                {
+                    return resul
+                }
+
+
                 for (int i = 0; i < packageInfos_running.size(); i++)
                 {
-                    if (packageInfos_running.get(i).packageName.equals(runningServiceInfos_checked.get(min_i).clientPackage))
+                    if (packageInfos_running.get(i).packageName.equals(runningServiceInfos_checked.get(min_i).process))
                     {
-                        return packageInfos_running.get(i);
+                        //On first place service search
+                        result_app_list_service = packageInfos_running.get(i);
                     }
                 }
             }
-        }
-            return null;
+            //On second place is activity search
+            result_app_list_activity = packageInfos_running.get(0);
+            return result_app_list;
+
+        } else return null;
+
 
     }
 }
