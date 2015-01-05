@@ -1,4 +1,4 @@
-package com.example.oit_sergei.cam_test;
+package com.example.oit_sergei.cam_test.checking_resource;
 
 import android.content.Context;
 import android.content.pm.PackageManager;

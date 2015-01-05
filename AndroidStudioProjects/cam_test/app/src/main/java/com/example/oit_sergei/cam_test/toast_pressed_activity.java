@@ -9,18 +9,21 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 
 public class toast_pressed_activity extends ActionBarActivity {
 
     private PackageInfo camera_blocked_pack;
+    private PackageInfo microphone_blocked_pack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_toast_pressed_activity);
 
-        registerReceiver(app_get, new IntentFilter("Camera_unavailable"));
+        registerReceiver(app_get_camera, new IntentFilter("Camera_unavailable"));
+        registerReceiver(app_get_microphone, new IntentFilter("Microphone_unavailable"));
     }
 
 
@@ -47,17 +50,19 @@ public class toast_pressed_activity extends ActionBarActivity {
     }
 
 
-    private BroadcastReceiver app_get = new BroadcastReceiver() {
+    private BroadcastReceiver app_get_camera = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            camera_blocked_pack = intent.getParcelableExtra("App_obj");
-            String cam_app_name = new String(camera_blocked_pack.applicationInfo.processName);
-            int j = 0;
+            camera_blocked_pack = intent.getParcelableExtra("Camera_app");
+            Toast.makeText(getApplicationContext(), camera_blocked_pack.packageName, Toast.LENGTH_LONG).show();
+        }
+    };
 
-
-
-
-
+    private BroadcastReceiver app_get_microphone = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            microphone_blocked_pack = intent.getParcelableExtra("Microphone_app");
+            Toast.makeText(getApplicationContext(), microphone_blocked_pack.packageName, Toast.LENGTH_LONG).show();
         }
     };
 

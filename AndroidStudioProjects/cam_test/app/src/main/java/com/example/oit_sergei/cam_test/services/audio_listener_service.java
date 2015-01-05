@@ -1,38 +1,39 @@
-package com.example.oit_sergei.cam_test;
-
+package com.example.oit_sergei.cam_test.services;
 
 import android.app.ActivityManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
-import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.widget.Toast;
+
+import com.example.oit_sergei.cam_test.MainActivity;
+import com.example.oit_sergei.cam_test.R;
+import com.example.oit_sergei.cam_test.checking_resource.audio_check;
+import com.example.oit_sergei.cam_test.toast_pressed_activity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyService extends Service  {
+public class audio_listener_service extends Service {
 
     private String[] cameraList;
     private String detailMessage;
-    private Camera camera;
-    private camera_check cameraCheck;
-    private CountDownTimer timer;
-    private long timer_count;
-    private String camera_permisson = new String("android.permission.CAMERA");
+    private audio_check audioCheck;
+    private String microphone_permisson = new String("android.permission.RECORD_AUDIO");
     private static int first_cycle_flag;
-    private PackageInfo  camera_blocked_pack = new PackageInfo();
-    private PackageInfo result_app_list_service = new PackageInfo();
-    private PackageInfo result_app_list_activity = new PackageInfo();
+    private PackageInfo audio_blocked_pack = new PackageInfo();
+    private PackageInfo result_app_service = new PackageInfo();
+    private PackageInfo result_app_activity = new PackageInfo();
 
-
-    public MyService() {
-
+    public audio_listener_service() {
     }
+
 
     @Override
     public void onCreate() {
@@ -45,40 +46,41 @@ public class MyService extends Service  {
 //        Toast.makeText(getApplicationContext(), "Start", Toast.LENGTH_SHORT).show();
         PendingIntent pendingIntent = intent.getParcelableExtra(MainActivity.PARAM_PINTENT);
 
-        cameraCheck = new camera_check();
-        int camera_availability = cameraCheck.camera_checking_process();
-        if (camera_availability == 0) {
+        audioCheck = new audio_check();
+        int audio_availability = audioCheck.audio_checking_process();
+        if (audio_availability == 0) {
 //            Toast.makeText(getApplicationContext(), "Camera opened", Toast.LENGTH_SHORT).show();
-            if (cameraCheck.camera_close() == true) {
+            boolean close_cheking = audioCheck.audio_close();
+            if (close_cheking == true) {
 //                Toast.makeText(getApplicationContext(), "Camera close OK", Toast.LENGTH_SHORT).show();
-            } else if (cameraCheck.camera_close() == false) {
+            } else if (close_cheking == false) {
 //                Toast.makeText(getApplicationContext(), "Camera close ERROR", Toast.LENGTH_SHORT).show();
             }
             first_cycle_flag = 1;
 
-        } else if (camera_availability == -1) {
+        } else if (audio_availability != 0) {
 //            Toast.makeText(this, "Camera unavailable", Toast.LENGTH_SHORT).show();
             if (first_cycle_flag == 1)
             {
-                camera_blocked_pack = application_resolve();
+                audio_blocked_pack = application_resolve();
 
-                if (camera_blocked_pack != null)
+                if (audio_blocked_pack != null)
                 {
                     first_cycle_flag = 0;
 
-                    Intent i = new Intent("Camera_unavailable")
-                            .putExtra("App_service", camera_blocked_pack.get(0))
-                            .putExtra("App_activity", camera_blocked_pack.get(1));
+                    Intent i = new Intent("Microphone_unavailable")
+                            .putExtra("Microphone_app", audio_blocked_pack);
+
                     sendBroadcast(i);
+                    send_notification(audio_blocked_pack);
+
                     stopSelf();
-
                 }
-
             }
 
 
-        } else if (camera_availability == -2) {
-            Toast.makeText(getApplicationContext(), "Camera error system", Toast.LENGTH_SHORT).show();
+        } else if (audio_availability == -2) {
+            Toast.makeText(getApplicationContext(), "Microphone error system", Toast.LENGTH_SHORT).show();
         }
 //        stopSelf();
 
@@ -86,38 +88,21 @@ public class MyService extends Service  {
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(Intent intent)
+    {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (camera != null) {
-            camera.release();
-            Toast.makeText(getApplicationContext(), "Stopped", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private long start_timer(int millis_count)
+    public void onDestroy()
     {
-        timer = new CountDownTimer(millis_count, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                timer_count = 1000 - millisUntilFinished;
-            }
+        super.onDestroy();
 
-            @Override
-            public void onFinish() {
-                timer.cancel();
-            }
-        };
-
-        return timer_count;
     }
 
-    public List<PackageInfo> application_resolve()
+
+    public PackageInfo application_resolve()
     {
         PackageManager packageManager = getPackageManager();
         List<PackageInfo> packageInfos = packageManager.getInstalledPackages(4096);
@@ -131,7 +116,7 @@ public class MyService extends Service  {
         List <ActivityManager.RunningAppProcessInfo> runningAppProcessInfos = activityManager.getRunningAppProcesses();
         List <ActivityManager.RunningServiceInfo> runningServiceInfos = activityManager.getRunningServices(Integer.MAX_VALUE);
 
-        //Создание контейнеров для отсеяных по camera permission processes и services
+        //Создание контейнеров для отсеяных по microphone permission processes и services
         List <PackageInfo> packageInfos_running = new ArrayList<>();
         List <ActivityManager.RunningAppProcessInfo> RunningAppProcessInfo_checked = new ArrayList<>();
         List <ActivityManager.RunningServiceInfo> runningServiceInfos_checked = new ArrayList<>();
@@ -139,7 +124,7 @@ public class MyService extends Service  {
         //Проверка Running Tasks для финального отбора activity
         List <ActivityManager.RunningTaskInfo> runningTaskInfos = activityManager.getRunningTasks(Integer.MAX_VALUE);
 
-        //Отсеивание всех запущенных активити по camera permission
+        //Отсеивание всех запущенных активити по microphone permission
         for (int i = 0; i < runningAppProcessInfos.size(); i++)
         {
             for (int j = 0; j < packageInfos.size(); j++)
@@ -150,7 +135,7 @@ public class MyService extends Service  {
                 {
                     for (int k = 0; k < packageInfos.get(j).requestedPermissions.length; k++)
                     {
-                        if (packageInfos.get(j).requestedPermissions[k].toString().equals(camera_permisson))
+                        if (packageInfos.get(j).requestedPermissions[k].toString().equals(microphone_permisson))
                         {
                             flag = 1;
                         }
@@ -166,15 +151,15 @@ public class MyService extends Service  {
             }
         }
 
-        //Отсеивание всех запущенных сервисов по camera permission
+        //Отсеивание всех запущенных сервисов по microphone permission
         run_index = 0;
-        for (int i = 0; i < packageInfos_running.size(); i++)
+        for (int i = 0; i < RunningAppProcessInfo_checked.size(); i++)
         {
             for (int j = 0; j < runningServiceInfos.size(); j++)
             {
                 flag = 0;
 
-                if (packageInfos_running.get(i).applicationInfo.processName.equals(runningServiceInfos.get(j).process))
+                if (RunningAppProcessInfo_checked.get(i).processName.equals(runningServiceInfos.get(j).process))
                 {
                     flag = 1;
                 }
@@ -202,38 +187,70 @@ public class MyService extends Service  {
                     }
                 };
 
-                long min_time = 500;
-                int min_i = 500;
+                long min_time = 1000;
+                int min_i = 1000;
                 for (int i = 1; i < runningServiceInfos_checked.size(); i++)
                 {
-                    if ((Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime) < min_time) && (i != my_process) && (runningServiceInfos_checked.get(i).process != "com.android.phone"))
+                    if ((Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime) < min_time)
+                            && (i != my_process)
+                            && !(runningServiceInfos_checked.get(i).process.equals("com.android.phone"))
+                            && !(runningServiceInfos_checked.get(i).process.equals("com.google.android.gms")))
                     {
                         min_time = Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime);
                         min_i = i;
                     }
                 }
 
-                if (min_i == 500)
+                if (min_i <= 500)
                 {
-                    return resul
-                }
-
-
-                for (int i = 0; i < packageInfos_running.size(); i++)
-                {
-                    if (packageInfos_running.get(i).packageName.equals(runningServiceInfos_checked.get(min_i).process))
+                    for (int i = 0; i < packageInfos_running.size(); i++)
                     {
-                        //On first place service search
-                        result_app_list_service = packageInfos_running.get(i);
+                        if (packageInfos_running.get(i).packageName.equals(runningServiceInfos_checked.get(min_i).process))
+                        {
+                            //On first place service search
+                            result_app_service = packageInfos_running.get(i);
+                        }
                     }
+                    return result_app_service;
+                } else
+                {
+                    return packageInfos_running.get(0);
                 }
-            }
-            //On second place is activity search
-            result_app_list_activity = packageInfos_running.get(0);
-            return result_app_list;
+
+            } else return null;
 
         } else return null;
 
 
     }
+
+    private static final int NOTIFY_ID = 101;
+    public void send_notification(PackageInfo pack_app)
+    {
+        Intent notification_intent = new Intent(getApplicationContext(), toast_pressed_activity.class)
+                .putExtra("Pack_app", pack_app);
+        PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, notification_intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+
+        Notification.Builder builder = new Notification.Builder(getApplicationContext());
+        builder.setContentIntent(contentIntent)
+                .setSmallIcon(R.drawable.ic_launcher)
+
+                .setTicker("Camera was opened")
+                .setWhen(System.currentTimeMillis())
+                .setAutoCancel(true)
+                        //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
+                .setContentTitle("Camera was opened")
+                        //.setContentText(res.getString(R.string.notifytext))
+                .setContentText("Check app: " + pack_app.packageName); // Текст уведомленимя
+
+        Notification notification = builder.build();
+        notification.defaults = Notification.DEFAULT_ALL;
+
+
+        NotificationManager notificationManager = (NotificationManager) getApplicationContext()
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFY_ID, notification);
+    }
+
 }

@@ -2,15 +2,15 @@ package com.example.oit_sergei.cam_test;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,11 +19,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.johnpersano.supertoasts.SuperToast;
-import com.github.johnpersano.supertoasts.util.OnClickWrapper;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.example.oit_sergei.cam_test.services.audio_listener_service;
+import com.example.oit_sergei.cam_test.services.camera_listener_service;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -32,18 +29,25 @@ public class MainActivity extends ActionBarActivity {
     private Button stop;
     private Button blockCamera;
     private Button unlockCamera;
+    private Button blockMicro;
+    private Button unlockMicro;
+
 
     private TextView textView;
     public static final String PARAM_PINTENT = "pendingIntent";
     public final static String PARAM_RESULT = "result";
-    private List<PackageInfo> camera_blocked_pack = new ArrayList<>();
+    private PackageInfo camera_blocked_pack = new PackageInfo();
 
     private Camera camera;
+    private AudioRecord audioRecord;
 
-    private AlarmManager alarmManager;
-    private PendingIntent alarmIntent;
+    private AlarmManager alarmManager_camera;
+    private AlarmManager alarmManager_microphone;
+    private PendingIntent alarmIntent_camera;
+    private PendingIntent alarmIntent_microphone;
+    private Intent intentToFire_camera;
+    private Intent intentToFire_microphone;
 
-    private Intent intentToFire;
     long time = 500;
     private int alarmType;
 
@@ -56,28 +60,32 @@ public class MainActivity extends ActionBarActivity {
         stop = (Button) findViewById(R.id.stop_cam_btn);
         blockCamera = (Button) findViewById(R.id.block_cam_btn);
         unlockCamera = (Button) findViewById(R.id.unlock_cam_btn);
+        blockMicro = (Button) findViewById(R.id.block_micro_btn);
+        unlockMicro = (Button) findViewById(R.id.unlock_micro_btn);
 
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        intentToFire = new Intent(this, MyService.class);
-
+        alarmManager_camera = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        intentToFire_camera = new Intent(this, camera_listener_service.class);
         alarmType = AlarmManager.ELAPSED_REALTIME;
 
-        registerReceiver(app_get, new IntentFilter("Camera_unavailable"));
+        alarmManager_microphone = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        intentToFire_microphone = new Intent(this, audio_listener_service.class);
+        alarmType = AlarmManager.ELAPSED_REALTIME;
+
     }
 
-    public void onStartClick(View v)
+    public void onCameraServiceStartClick(View v)
     {
-        alarmIntent = PendingIntent.getService(this, 0, intentToFire, 0);
-        alarmManager.setInexactRepeating(alarmType, time, time, alarmIntent);
+        alarmIntent_camera = PendingIntent.getService(this, 0, intentToFire_camera, 0);
+        alarmManager_camera.setInexactRepeating(alarmType, time, time, alarmIntent_camera);
         Toast.makeText(getApplicationContext(), "Service is starting now...", Toast.LENGTH_SHORT).show();
     }
 
-    public void onStopClick(View v)
+    public void onCameraServiceStopClick(View v)
     {
         try {
-            stopService(new Intent(this, MyService.class));
-            alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            alarmManager.cancel(alarmIntent);
+            stopService(new Intent(this, camera_listener_service.class));
+            alarmManager_camera = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            alarmManager_camera.cancel(alarmIntent_camera);
             Toast.makeText(getApplicationContext(), "Service closed", Toast.LENGTH_SHORT).show();
         } catch (RuntimeException re)
         {
@@ -101,7 +109,6 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-
     public void onUnlockCameraClick(View V)
     {
         if (camera != null)
@@ -111,43 +118,61 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    public void onMicrophoneServiceStartClick(View v)
+    {
+        alarmIntent_microphone = PendingIntent.getService(this, 0, intentToFire_microphone, 0);
+        alarmManager_microphone.setInexactRepeating(alarmType, time, time, alarmIntent_microphone);
+        Toast.makeText(getApplicationContext(), "Service is starting now...", Toast.LENGTH_SHORT).show();
+    }
 
-    private BroadcastReceiver app_get = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            PackageInfo temp;
-            temp = intent.getParcelableExtra("App_service");
-            camera_blocked_pack.add(temp);
-            temp = intent.getParcelableExtra("App_activity");
-            camera_blocked_pack.add(temp);
+    public void onMicrophoneServiceStopClick(View v)
+    {
+        try {
+            stopService(new Intent(this, camera_listener_service.class));
+            alarmManager_microphone = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            alarmManager_microphone.cancel(alarmIntent_microphone);
+            Toast.makeText(getApplicationContext(), "Service closed", Toast.LENGTH_SHORT).show();
+        } catch (RuntimeException re)
+        {
+            Toast.makeText(getApplicationContext(), "Can not close the service",Toast.LENGTH_SHORT).show();
+        }
 
-           /* String cam_app_name = new String(camera_blocked_pack.applicationInfo.processName);
-            int j = 0;
+    }
 
-            String szDelimeters = ".";
-            String app_name = new String();
-            app_name = camera_blocked_pack.applicationInfo.processName;
-            StringTokenizer stringTokenizer = new StringTokenizer(camera_blocked_pack.applicationInfo.processName, szDelimeters, true);
-            while (stringTokenizer.hasMoreTokens())
-            {
-                app_name = stringTokenizer.nextToken();
-            }*/
+    public void onBlockMicroClick(View v)
+    {
 
-            Toast.makeText(getApplicationContext(), camera_blocked_pack.get(0).packageName + "\n" + camera_blocked_pack.get(1).packageName, Toast.LENGTH_LONG).show();
+        int sampleRate = 44100;
+        int channelConfig = AudioFormat.CHANNEL_IN_MONO;
+        int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
 
+        int minInternalBufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig,
+                audioFormat);
+        int internalBufferSize = minInternalBufferSize * 4;
+        audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC,
+                sampleRate, channelConfig, audioFormat, internalBufferSize);
+
+        if (audioRecord.getState() == AudioRecord.STATE_INITIALIZED)
+        {
+            audioRecord.startRecording();
 
         }
-    };
 
-    OnClickWrapper onClickWrapper = new OnClickWrapper("superactivitytoast", new SuperToast.OnClickListener() {
-        @Override
-        public void onClick(View view, Parcelable parcelable) {
-            Intent intent = new Intent(MainActivity.this, toast_pressed_activity.class);
-            startActivity(intent);
+        int temp = audioRecord.getRecordingState();
+        if (audioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING)
+        {
+            Toast.makeText(getApplicationContext(), "Microphone is blocked", Toast.LENGTH_SHORT).show();
         }
-    });
+    }
 
-
+    public void onUnlockMicroClick(View v)
+    {
+        if (audioRecord != null) {
+            audioRecord.stop();
+            Toast.makeText(getApplicationContext(), "Microphone is unblocked", Toast.LENGTH_SHORT).show();
+            audioRecord.release();
+        }
+    }
 
     private boolean checkCameraHardware(Context context) {
         if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){

@@ -1,24 +1,26 @@
-package com.example.oit_sergei.cam_test;
+package com.example.oit_sergei.cam_test.applications_lists;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.oit_sergei.cam_test.R;
 
-public class white_list_activity extends ActionBarActivity {
+
+public class black_list_activity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_white_list_activity);
+        setContentView(R.layout.activity_black_list_activity);
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_white_list_activity, menu);
+        getMenuInflater().inflate(R.menu.menu_black_list_activity, menu);
         return true;
     }
 

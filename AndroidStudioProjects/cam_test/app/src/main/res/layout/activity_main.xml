@@ -48,14 +48,16 @@
                 android:layout_height="wrap_content"
                 android:text="@string/BLOCK_MICRO"
                 android:id="@+id/block_micro_btn"
-                android:layout_weight="50" />
+                android:layout_weight="50"
+                android:onClick="onBlockMicroClick"/>
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/UNLOCK_MIRCO"
                 android:id="@+id/unlock_micro_btn"
-                android:layout_weight="50"/>
+                android:layout_weight="50"
+                android:onClick="onUnlockMicroClick"/>
         </LinearLayout>
 
         <LinearLayout
@@ -70,7 +72,7 @@
                 android:text="@string/START_CAM"
                 android:id="@+id/start_cam_btn"
                 android:layout_weight="50"
-                android:onClick="onStartClick" />
+                android:onClick="onCameraServiceStartClick" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -78,7 +80,7 @@
                 android:text="@string/STOP_CAM"
                 android:id="@+id/stop_cam_btn"
                 android:layout_weight="50"
-                android:onClick="onStopClick" />
+                android:onClick="onCameraServiceStopClick" />
         </LinearLayout>
 
         <LinearLayout
@@ -91,14 +93,16 @@
                 android:layout_height="wrap_content"
                 android:text="@string/START_MIC"
                 android:id="@+id/start_mic_btn"
-                android:layout_weight="50"/>
+                android:layout_weight="50"
+                android:onClick="onMicrophoneServiceStartClick"/>
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/STOP_MIC"
                 android:id="@+id/stop_mic_btn"
-                android:layout_weight="50"/>
+                android:layout_weight="50"
+                android:onClick="onMicrophoneServiceStopClick"/>
         </LinearLayout>
 
         <LinearLayout
