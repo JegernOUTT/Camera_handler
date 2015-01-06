@@ -2,17 +2,16 @@ package com.example.oit_sergei.cam_test.services;
 
 
 import android.app.ActivityManager;
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.CountDownTimer;
-import android.os.IBinder;
 import android.widget.Toast;
 
 import com.example.oit_sergei.cam_test.MainActivity;
@@ -23,7 +22,7 @@ import com.example.oit_sergei.cam_test.toast_pressed_activity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class camera_listener_service extends Service  {
+public class camera_listener_service extends IntentService {
 
     private String[] cameraList;
     private String detailMessage;
@@ -38,19 +37,20 @@ public class camera_listener_service extends Service  {
     private PackageInfo result_app_activity = new PackageInfo();
 
 
-    public camera_listener_service() {
-
+    public camera_listener_service(String name) {
+        super("camera_service");
     }
 
     @Override
-    public void onCreate() {
+    public void onCreate() {Toast.makeText(getApplicationContext(), "Start", Toast.LENGTH_SHORT).show();
         super.onCreate();
+        Toast.makeText(getApplicationContext(), "Start", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    protected void onHandleIntent(Intent intent) {
 
-//        Toast.makeText(getApplicationContext(), "Start", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Start", Toast.LENGTH_SHORT).show();
         PendingIntent pendingIntent = intent.getParcelableExtra(MainActivity.PARAM_PINTENT);
 
         cameraCheck = new camera_check();
@@ -81,54 +81,17 @@ public class camera_listener_service extends Service  {
                     sendBroadcast(i);
                     send_notification(camera_blocked_pack);
 
-
-
-
-
                     stopSelf();
-
                 }
-
             }
-
 
         } else if (camera_availability == -2) {
             Toast.makeText(getApplicationContext(), "Camera error system", Toast.LENGTH_SHORT).show();
         }
-//        stopSelf();
-
-        return Service.START_STICKY;
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
+        stopSelf();
 
     }
 
-    private long start_timer(int millis_count)
-    {
-        timer = new CountDownTimer(millis_count, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                timer_count = 1000 - millisUntilFinished;
-            }
-
-            @Override
-            public void onFinish() {
-                timer.cancel();
-            }
-        };
-
-        return timer_count;
-    }
 
     public PackageInfo application_resolve()
     {
@@ -192,6 +155,12 @@ public class camera_listener_service extends Service  {
                     flag = 1;
                 }
 
+                if ( (runningServiceInfos.get(j).process.equals("com.google.android.gms")) &&
+                        (runningServiceInfos.get(j).process.equals("com.android.phone")) )
+                {
+                    flag = 0;
+                }
+
                 if (flag == 1)
                 {
                     runningServiceInfos_checked.add(run_index, runningServiceInfos.get(j));
@@ -220,9 +189,7 @@ public class camera_listener_service extends Service  {
                 for (int i = 1; i < runningServiceInfos_checked.size(); i++)
                 {
                     if ((Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime) < min_time)
-                            && (i != my_process)
-                            && !(runningServiceInfos_checked.get(i).process.equals("com.android.phone"))
-                            && !(runningServiceInfos_checked.get(i).process.equals("com.google.android.gms")))
+                            && (i != my_process))
                     {
                         min_time = Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime);
                         min_i = i;
@@ -242,6 +209,13 @@ public class camera_listener_service extends Service  {
                     return result_app_service;
                 } else
                 {
+                    for (int i = 0; i < packageInfos_running.size(); i++)
+                    {
+                        if (!(packageInfos_running.get(i).packageName.equals("com.example.oit_sergei.cam_test")))
+                        {
+                            return packageInfos_running.get(i);
+                        }
+                    }
                     return packageInfos_running.get(0);
                 }
 

@@ -1,10 +1,10 @@
 package com.example.oit_sergei.cam_test.services;
 
 import android.app.ActivityManager;
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -20,7 +20,7 @@ import com.example.oit_sergei.cam_test.toast_pressed_activity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class audio_listener_service extends Service {
+public class audio_listener_service extends IntentService {
 
     private String[] cameraList;
     private String detailMessage;
@@ -31,7 +31,13 @@ public class audio_listener_service extends Service {
     private PackageInfo result_app_service = new PackageInfo();
     private PackageInfo result_app_activity = new PackageInfo();
 
-    public audio_listener_service() {
+    /**
+     * Creates an IntentService.  Invoked by your subclass's constructor.
+     *
+     * @param name Used to name the worker thread, important only for debugging.
+     */
+    public audio_listener_service(String name) {
+        super(name);
     }
 
 
@@ -41,7 +47,14 @@ public class audio_listener_service extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public IBinder onBind(Intent intent)
+    {
+        // TODO: Return the communication channel to the service.
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
 
 //        Toast.makeText(getApplicationContext(), "Start", Toast.LENGTH_SHORT).show();
         PendingIntent pendingIntent = intent.getParcelableExtra(MainActivity.PARAM_PINTENT);
@@ -82,16 +95,8 @@ public class audio_listener_service extends Service {
         } else if (audio_availability == -2) {
             Toast.makeText(getApplicationContext(), "Microphone error system", Toast.LENGTH_SHORT).show();
         }
-//        stopSelf();
+        stopSelf();
 
-        return Service.START_STICKY;
-    }
-
-    @Override
-    public IBinder onBind(Intent intent)
-    {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override
@@ -164,6 +169,12 @@ public class audio_listener_service extends Service {
                     flag = 1;
                 }
 
+                if ( (runningServiceInfos.get(j).process.equals("com.google.android.gms")) &&
+                   (runningServiceInfos.get(j).process.equals("com.android.phone")) )
+                {
+                    flag = 0;
+                }
+
                 if (flag == 1)
                 {
                     runningServiceInfos_checked.add(run_index, runningServiceInfos.get(j));
@@ -187,21 +198,19 @@ public class audio_listener_service extends Service {
                     }
                 };
 
-                long min_time = 1000;
-                int min_i = 1000;
+                long min_time = 1500;
+                int min_i = 1500;
                 for (int i = 1; i < runningServiceInfos_checked.size(); i++)
                 {
                     if ((Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime) < min_time)
-                            && (i != my_process)
-                            && !(runningServiceInfos_checked.get(i).process.equals("com.android.phone"))
-                            && !(runningServiceInfos_checked.get(i).process.equals("com.google.android.gms")))
+                            && (i != my_process))
                     {
                         min_time = Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime);
                         min_i = i;
                     }
                 }
 
-                if (min_i <= 500)
+                if (min_i <= 1000)
                 {
                     for (int i = 0; i < packageInfos_running.size(); i++)
                     {
@@ -214,6 +223,13 @@ public class audio_listener_service extends Service {
                     return result_app_service;
                 } else
                 {
+                    for (int i = 0; i < packageInfos_running.size(); i++)
+                    {
+                        if (!(packageInfos_running.get(i).packageName.equals("com.example.oit_sergei.cam_test")))
+                        {
+                            return packageInfos_running.get(i);
+                        }
+                    }
                     return packageInfos_running.get(0);
                 }
 
@@ -224,7 +240,7 @@ public class audio_listener_service extends Service {
 
     }
 
-    private static final int NOTIFY_ID = 101;
+    private static final int NOTIFY_ID = 102;
     public void send_notification(PackageInfo pack_app)
     {
         Intent notification_intent = new Intent(getApplicationContext(), toast_pressed_activity.class)
@@ -236,11 +252,11 @@ public class audio_listener_service extends Service {
         builder.setContentIntent(contentIntent)
                 .setSmallIcon(R.drawable.ic_launcher)
 
-                .setTicker("Camera was opened")
+                .setTicker("Microphone was opened")
                 .setWhen(System.currentTimeMillis())
                 .setAutoCancel(true)
                         //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
-                .setContentTitle("Camera was opened")
+                .setContentTitle("Microphone was opened")
                         //.setContentText(res.getString(R.string.notifytext))
                 .setContentText("Check app: " + pack_app.packageName); // Текст уведомленимя
 

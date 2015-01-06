@@ -22,6 +22,8 @@ import android.widget.Toast;
 import com.example.oit_sergei.cam_test.services.audio_listener_service;
 import com.example.oit_sergei.cam_test.services.camera_listener_service;
 
+import java.util.Calendar;
+
 
 public class MainActivity extends ActionBarActivity {
 
@@ -41,6 +43,14 @@ public class MainActivity extends ActionBarActivity {
     private Camera camera;
     private AudioRecord audioRecord;
 
+
+    private Thread myThread_microphone = new Thread(new Runnable() {
+        @Override
+        public void run() {
+
+        }
+    });
+
     private AlarmManager alarmManager_camera;
     private AlarmManager alarmManager_microphone;
     private PendingIntent alarmIntent_camera;
@@ -48,7 +58,8 @@ public class MainActivity extends ActionBarActivity {
     private Intent intentToFire_camera;
     private Intent intentToFire_microphone;
 
-    long time = 500;
+    long time_camera_update = 500;
+    long time_microphone_update = 1000;
     private int alarmType;
 
 
@@ -63,20 +74,24 @@ public class MainActivity extends ActionBarActivity {
         blockMicro = (Button) findViewById(R.id.block_micro_btn);
         unlockMicro = (Button) findViewById(R.id.unlock_micro_btn);
 
-        alarmManager_camera = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        intentToFire_camera = new Intent(this, camera_listener_service.class);
-        alarmType = AlarmManager.ELAPSED_REALTIME;
-
-        alarmManager_microphone = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        intentToFire_microphone = new Intent(this, audio_listener_service.class);
-        alarmType = AlarmManager.ELAPSED_REALTIME;
-
     }
 
     public void onCameraServiceStartClick(View v)
     {
-        alarmIntent_camera = PendingIntent.getService(this, 0, intentToFire_camera, 0);
-        alarmManager_camera.setInexactRepeating(alarmType, time, time, alarmIntent_camera);
+
+        try {
+            Calendar cal = Calendar.getInstance();
+            alarmManager_camera = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            intentToFire_camera = new Intent(this, camera_listener_service.class);
+            alarmType = AlarmManager.ELAPSED_REALTIME;
+
+            alarmIntent_camera = PendingIntent.getService(this, 0, intentToFire_camera, 0);
+            alarmManager_camera.setRepeating(alarmType, cal.getTimeInMillis() + 1000, time_camera_update, alarmIntent_camera);
+        } catch (Exception s)
+        {
+            Toast.makeText(this, s.toString(), Toast.LENGTH_SHORT).show();
+        }
+
         Toast.makeText(getApplicationContext(), "Service is starting now...", Toast.LENGTH_SHORT).show();
     }
 
@@ -85,7 +100,16 @@ public class MainActivity extends ActionBarActivity {
         try {
             stopService(new Intent(this, camera_listener_service.class));
             alarmManager_camera = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            alarmManager_camera.cancel(alarmIntent_camera);
+            if (alarmIntent_camera != null)
+            {
+                alarmManager_camera.cancel(alarmIntent_camera);
+            } else
+            {
+                intentToFire_camera = new Intent(getApplicationContext(), camera_listener_service.class);
+                alarmIntent_camera = PendingIntent.getService(this, 0, intentToFire_camera, 0);
+                alarmManager_camera.cancel(alarmIntent_camera);
+            }
+
             Toast.makeText(getApplicationContext(), "Service closed", Toast.LENGTH_SHORT).show();
         } catch (RuntimeException re)
         {
@@ -120,8 +144,12 @@ public class MainActivity extends ActionBarActivity {
 
     public void onMicrophoneServiceStartClick(View v)
     {
-        alarmIntent_microphone = PendingIntent.getService(this, 0, intentToFire_microphone, 0);
-        alarmManager_microphone.setInexactRepeating(alarmType, time, time, alarmIntent_microphone);
+        alarmManager_microphone = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        intentToFire_microphone = new Intent(getApplicationContext(), audio_listener_service.class);
+        alarmType = AlarmManager.ELAPSED_REALTIME;
+
+        alarmIntent_microphone = PendingIntent.getService(getApplicationContext(), 0, intentToFire_microphone, 0);
+        alarmManager_microphone.setInexactRepeating(alarmType, time_microphone_update, time_microphone_update, alarmIntent_microphone);
         Toast.makeText(getApplicationContext(), "Service is starting now...", Toast.LENGTH_SHORT).show();
     }
 
@@ -130,13 +158,22 @@ public class MainActivity extends ActionBarActivity {
         try {
             stopService(new Intent(this, camera_listener_service.class));
             alarmManager_microphone = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            alarmManager_microphone.cancel(alarmIntent_microphone);
+
+            if (alarmIntent_microphone != null)
+            {
+                alarmManager_microphone.cancel(alarmIntent_microphone);
+            } else
+            {
+                intentToFire_microphone = new Intent(getApplicationContext(), audio_listener_service.class);
+                alarmIntent_microphone = PendingIntent.getService(this, 0, intentToFire_microphone, 0);
+                alarmManager_microphone.cancel(alarmIntent_microphone);
+            }
+
             Toast.makeText(getApplicationContext(), "Service closed", Toast.LENGTH_SHORT).show();
         } catch (RuntimeException re)
         {
             Toast.makeText(getApplicationContext(), "Can not close the service",Toast.LENGTH_SHORT).show();
         }
-
     }
 
     public void onBlockMicroClick(View v)

@@ -32,7 +32,7 @@ public class audio_check {
             try
             {
                 audioRecord.startRecording();
-                if (audioRecord.getState() == AudioRecord.RECORDSTATE_RECORDING)
+                if (audioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING)
                 {
                     return 0;
                 }
