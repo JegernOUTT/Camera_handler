@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.IBinder;
 import android.widget.Toast;
 
 import com.example.oit_sergei.cam_test.MainActivity;
@@ -31,26 +30,9 @@ public class audio_listener_service extends IntentService {
     private PackageInfo result_app_service = new PackageInfo();
     private PackageInfo result_app_activity = new PackageInfo();
 
-    /**
-     * Creates an IntentService.  Invoked by your subclass's constructor.
-     *
-     * @param name Used to name the worker thread, important only for debugging.
-     */
-    public audio_listener_service(String name) {
-        super(name);
-    }
 
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
-
-    @Override
-    public IBinder onBind(Intent intent)
-    {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+    public audio_listener_service() {
+        super("audio_listener_service");
     }
 
     @Override
@@ -87,7 +69,7 @@ public class audio_listener_service extends IntentService {
                     sendBroadcast(i);
                     send_notification(audio_blocked_pack);
 
-                    stopSelf();
+//                   stopSelf();
                 }
             }
 
@@ -95,14 +77,7 @@ public class audio_listener_service extends IntentService {
         } else if (audio_availability == -2) {
             Toast.makeText(getApplicationContext(), "Microphone error system", Toast.LENGTH_SHORT).show();
         }
-        stopSelf();
-
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
+//        stopSelf();
 
     }
 
@@ -203,7 +178,8 @@ public class audio_listener_service extends IntentService {
                 for (int i = 1; i < runningServiceInfos_checked.size(); i++)
                 {
                     if ((Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime) < min_time)
-                            && (i != my_process))
+                            && (i != my_process)
+                            && !(runningServiceInfos_checked.get(i).process.equals("com.example.oit_sergei.cam_test")))
                     {
                         min_time = Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime);
                         min_i = i;

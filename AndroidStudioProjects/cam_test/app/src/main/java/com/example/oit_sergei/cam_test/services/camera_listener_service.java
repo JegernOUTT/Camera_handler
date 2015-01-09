@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
-import android.os.CountDownTimer;
 import android.widget.Toast;
 
 import com.example.oit_sergei.cam_test.MainActivity;
@@ -28,8 +27,6 @@ public class camera_listener_service extends IntentService {
     private String detailMessage;
     private Camera camera;
     private camera_check cameraCheck;
-    private CountDownTimer timer;
-    private long timer_count;
     private String camera_permisson = new String("android.permission.CAMERA");
     private static int first_cycle_flag;
     private PackageInfo  camera_blocked_pack = new PackageInfo();
@@ -37,20 +34,14 @@ public class camera_listener_service extends IntentService {
     private PackageInfo result_app_activity = new PackageInfo();
 
 
-    public camera_listener_service(String name) {
-        super("camera_service");
-    }
-
-    @Override
-    public void onCreate() {Toast.makeText(getApplicationContext(), "Start", Toast.LENGTH_SHORT).show();
-        super.onCreate();
-        Toast.makeText(getApplicationContext(), "Start", Toast.LENGTH_SHORT).show();
+    public camera_listener_service() {
+        super("camera_listener_service");
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        Toast.makeText(getApplicationContext(), "Start", Toast.LENGTH_SHORT).show();
+  //      Toast.makeText(getApplicationContext(), "Start", Toast.LENGTH_SHORT).show();
         PendingIntent pendingIntent = intent.getParcelableExtra(MainActivity.PARAM_PINTENT);
 
         cameraCheck = new camera_check();
@@ -81,14 +72,14 @@ public class camera_listener_service extends IntentService {
                     sendBroadcast(i);
                     send_notification(camera_blocked_pack);
 
-                    stopSelf();
+                    //stopSelf();
                 }
             }
 
         } else if (camera_availability == -2) {
             Toast.makeText(getApplicationContext(), "Camera error system", Toast.LENGTH_SHORT).show();
         }
-        stopSelf();
+        //stopSelf();
 
     }
 
@@ -189,7 +180,8 @@ public class camera_listener_service extends IntentService {
                 for (int i = 1; i < runningServiceInfos_checked.size(); i++)
                 {
                     if ((Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime) < min_time)
-                            && (i != my_process))
+                            && (i != my_process)
+                            && !(runningServiceInfos_checked.get(i).process.equals("com.example.oit_sergei.cam_test")))
                     {
                         min_time = Math.abs(runningServiceInfos_checked.get(i).lastActivityTime - runningServiceInfos_checked.get(my_process).lastActivityTime);
                         min_i = i;

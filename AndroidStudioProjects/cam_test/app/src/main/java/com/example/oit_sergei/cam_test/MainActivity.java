@@ -11,6 +11,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,8 +22,6 @@ import android.widget.Toast;
 
 import com.example.oit_sergei.cam_test.services.audio_listener_service;
 import com.example.oit_sergei.cam_test.services.camera_listener_service;
-
-import java.util.Calendar;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -78,19 +77,12 @@ public class MainActivity extends ActionBarActivity {
 
     public void onCameraServiceStartClick(View v)
     {
+        alarmManager_camera = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        intentToFire_camera = new Intent(getApplicationContext(), camera_listener_service.class);
+        alarmType = AlarmManager.ELAPSED_REALTIME;
 
-        try {
-            Calendar cal = Calendar.getInstance();
-            alarmManager_camera = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            intentToFire_camera = new Intent(this, camera_listener_service.class);
-            alarmType = AlarmManager.ELAPSED_REALTIME;
-
-            alarmIntent_camera = PendingIntent.getService(this, 0, intentToFire_camera, 0);
-            alarmManager_camera.setRepeating(alarmType, cal.getTimeInMillis() + 1000, time_camera_update, alarmIntent_camera);
-        } catch (Exception s)
-        {
-            Toast.makeText(this, s.toString(), Toast.LENGTH_SHORT).show();
-        }
+        alarmIntent_camera = PendingIntent.getService(getApplicationContext(), 0, intentToFire_camera, 0);
+        alarmManager_camera.setInexactRepeating(alarmType, SystemClock.elapsedRealtime() + time_camera_update, time_camera_update, alarmIntent_camera);
 
         Toast.makeText(getApplicationContext(), "Service is starting now...", Toast.LENGTH_SHORT).show();
     }
@@ -145,11 +137,12 @@ public class MainActivity extends ActionBarActivity {
     public void onMicrophoneServiceStartClick(View v)
     {
         alarmManager_microphone = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        intentToFire_microphone = new Intent(getApplicationContext(), audio_listener_service.class);
+        intentToFire_microphone = new Intent(this, audio_listener_service.class);
         alarmType = AlarmManager.ELAPSED_REALTIME;
 
-        alarmIntent_microphone = PendingIntent.getService(getApplicationContext(), 0, intentToFire_microphone, 0);
-        alarmManager_microphone.setInexactRepeating(alarmType, time_microphone_update, time_microphone_update, alarmIntent_microphone);
+        alarmIntent_microphone = PendingIntent.getService(this, 0, intentToFire_microphone, 0);
+        alarmManager_microphone.setRepeating(alarmType, SystemClock.elapsedRealtime() + time_microphone_update, time_microphone_update, alarmIntent_microphone);
+
         Toast.makeText(getApplicationContext(), "Service is starting now...", Toast.LENGTH_SHORT).show();
     }
 
@@ -178,7 +171,6 @@ public class MainActivity extends ActionBarActivity {
 
     public void onBlockMicroClick(View v)
     {
-
         int sampleRate = 44100;
         int channelConfig = AudioFormat.CHANNEL_IN_MONO;
         int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
