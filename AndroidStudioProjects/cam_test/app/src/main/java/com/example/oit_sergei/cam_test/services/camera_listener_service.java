@@ -66,10 +66,7 @@ public class camera_listener_service extends IntentService {
                 {
                     first_cycle_flag = 0;
 
-                    Intent i = new Intent("Camera_unavailable")
-                            .putExtra("Camera_app", camera_blocked_pack);
 
-                    sendBroadcast(i);
                     send_notification(camera_blocked_pack);
 
                     //stopSelf();
@@ -222,7 +219,8 @@ public class camera_listener_service extends IntentService {
     public void send_notification(PackageInfo pack_app)
     {
         Intent notification_intent = new Intent(getApplicationContext(), toast_pressed_activity.class)
-                .putExtra("Pack_app", pack_app);
+                .putExtra("Pack_app", pack_app)
+                .putExtra("Camera_app", camera_blocked_pack);
         PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, notification_intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
 
@@ -239,6 +237,7 @@ public class camera_listener_service extends IntentService {
                 .setContentText("Check app: " + pack_app.packageName); // Текст уведомленимя
 
         Notification notification = builder.build();
+
         notification.defaults = Notification.DEFAULT_ALL;
 
 

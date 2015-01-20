@@ -27,7 +27,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/exit_app_block"
-                android:id="@+id/exit_app_block_btn" />
+                android:id="@+id/exit_app_block_btn"
+                android:onClick="exit_blockCamera"/>
 
         </LinearLayout>
 
@@ -40,7 +41,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/exit_app_block_mic"
-                android:id="@+id/exit_app1_block_btn" />
+                android:id="@+id/exit_app1_block_btn"
+                android:nestedScrollingEnabled="false"
+                android:onClick="exit_blockMicro"/>
         </LinearLayout>
 
         <LinearLayout
@@ -90,7 +93,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/exit_app"
                 android:id="@+id/exit_app_btn"
-                android:layout_weight="50"/>
+                android:layout_weight="50"
+                android:onClick="exit_pack"/>
         </LinearLayout>
     </LinearLayout>
 
