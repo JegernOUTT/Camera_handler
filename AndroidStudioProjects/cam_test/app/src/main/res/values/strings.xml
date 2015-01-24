@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">cam_test</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">KRUGIS</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="title_activity_camera">CameraActivity</string>
+    <string name="title_activity_main">KRUGIS</string>
     <string name="BLOCK_CAMERA">BLOCK CAMERA</string>
     <string name="BLOCK_MICRO">BLOCK MICROPHONE</string>
     <string name="START_CAM">START CAM SERVICE</string>
@@ -15,10 +13,10 @@
     <string name="SHOW_WHITE">SHOW WHITE LIST</string>
     <string name="SHOW_BLACK">SHOW BLACK LIST</string>
     <string name="ABOUT">ABOUT</string>
-    <string name="title_activity_toast_pressed_activity">toast_pressed_activity</string>
-    <string name="title_activity_white_list">white_list</string>
-    <string name="title_activity_black_list_activity">black_list_activity</string>
-    <string name="title_activity_white_list_activity">white_list_activity</string>
+    <string name="title_activity_toast_pressed_activity">Application Blocker</string>
+    <string name="title_activity_white_list">White List</string>
+    <string name="title_activity_black_list_activity">Black List</string>
+    <string name="title_activity_white_list_activity">White List</string>
     <string name="exit_app_block">EXIT APP AND BLOCK CAMERA</string>
     <string name="exit_app_block_mic">EXIT APP AND BLOCK MICROPHONE</string>
     <string name="add_to_white">ADD TO WHITE LIST</string>

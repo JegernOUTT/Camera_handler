@@ -4,7 +4,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.example.oit_sergei.cam_test.toast_pressed_activity">
+    tools:context="com.example.oit_sergei.KRUGIS.toast_pressed_activity">
 
     <LinearLayout
         android:orientation="vertical"
@@ -78,7 +78,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/allow_this"
                 android:id="@+id/allow_this_btn"
-                android:layout_weight="50" />
+                android:layout_weight="50"
+                android:onClick="allowThisTime"/>
 
         </LinearLayout>
 
