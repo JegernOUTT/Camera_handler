@@ -28,5 +28,6 @@
     <string name="UNLOCK_MIRCO">UNLOCK MICROPHONE</string>
     <string name="title_activity_files_connect">Files_connect</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_swipe_list_view">SwipeListViewActivity</string>
 
 </resources>

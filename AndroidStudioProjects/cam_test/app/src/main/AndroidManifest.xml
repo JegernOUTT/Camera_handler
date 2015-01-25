@@ -13,6 +13,8 @@
 
     <uses-feature android:name="android.hardware.camera" />
 
+    android:excludeFromRecents="true"
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -50,9 +52,10 @@
             android:name=".applications_lists.white_list_activity"
             android:label="@string/title_activity_white_list_activity" >
         </activity>
+
         <activity
-            android:name=".files.Files_connect"
-            android:label="@string/title_activity_files_connect" >
+            android:name=".applications_lists.SwipeListViewActivity"
+            android:label="@string/title_activity_swipe_list_view" >
         </activity>
     </application>
 

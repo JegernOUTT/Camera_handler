@@ -57,14 +57,16 @@
                 android:layout_height="wrap_content"
                 android:text="@string/add_to_white"
                 android:id="@+id/add_to_white_btn"
-                android:layout_weight="50"/>
+                android:layout_weight="50"
+                android:onClick="add_to_white"/>
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/add_to_blavk"
                 android:id="@+id/add_to_black_btn"
-                android:layout_weight="50"/>
+                android:layout_weight="50"
+                android:onClick="add_to_black"/>
         </LinearLayout>
 
         <LinearLayout
