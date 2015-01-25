@@ -17,6 +17,7 @@
     <string name="title_activity_white_list">White List</string>
     <string name="title_activity_black_list_activity">Black List</string>
     <string name="title_activity_white_list_activity">White List</string>
+    <string name="title_activity_Files_connect_activity">Files</string>
     <string name="exit_app_block">EXIT APP AND BLOCK CAMERA</string>
     <string name="exit_app_block_mic">EXIT APP AND BLOCK MICROPHONE</string>
     <string name="add_to_white">ADD TO WHITE LIST</string>
@@ -25,5 +26,7 @@
     <string name="exit_app">EXIT APP</string>
     <string name="UNLOCK_CAM">UNLOCK CAMERA</string>
     <string name="UNLOCK_MIRCO">UNLOCK MICROPHONE</string>
+    <string name="title_activity_files_connect">Files_connect</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

@@ -5,8 +5,8 @@ android {
     buildToolsVersion "21.1.1"
 
     defaultConfig {
-        applicationId "com.oit_sergei.cam_test"
-        minSdkVersion 15
+        applicationId "com.oit_sergei.KRUGIS"
+        minSdkVersion 19
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
