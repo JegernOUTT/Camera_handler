@@ -131,6 +131,30 @@
 
         </LinearLayout>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/textView2"
+            android:layout_gravity="center_horizontal"
+            android:padding="5dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/textView3"
+            android:layout_gravity="center_horizontal"
+            android:padding="5dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/update_status"
+            android:id="@+id/button"
+            android:layout_gravity="center_horizontal"
+            android:onClick="update_services_status"/>
+
     </LinearLayout>
 
 </RelativeLayout>
