@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
@@ -82,15 +83,16 @@ public class camera_listener_service extends IntentService {
                         {
                             if (black_list.get(i).equals(using_app))
                             {
-                               // ActivityManager activityManager = (ActivityManager)this.getSystemService(ACTIVITY_SERVICE);
+                                ActivityManager activityManager = (ActivityManager)this.getSystemService(ACTIVITY_SERVICE);
 
-                               // activityManager.restartPackage(camera_blocked_pack.packageName);
+                                activityManager.restartPackage(camera_blocked_pack.packageName);
+                                activityManager.killBackgroundProcesses(camera_blocked_pack.packageName);
 
-                                Toast.makeText(getApplicationContext(), "Application " + using_app + " in Black List and using camera", Toast.LENGTH_SHORT).show();
-                                killed_flag = 2;
-                                //Intent notification_intent = new Intent(this, toast_pressed_activity.class)
-                                //        .putExtra("Camera_app", camera_blocked_pack);
-                                //startActivity(notification_intent);
+                                Toast.makeText(this, "Application " + using_app + " in Black List and using camera. Minimize or close application",
+                                        Toast.LENGTH_LONG).show();
+                                killed_flag = 1;
+                                Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+                                v.vibrate(10000);
 
                             }
                         }
@@ -185,8 +187,8 @@ public class camera_listener_service extends IntentService {
                     flag = 1;
                 }
 
-                if ( (runningServiceInfos.get(j).process.equals("com.google.android.gms")) &&
-                        (runningServiceInfos.get(j).process.equals("com.android.phone")) )
+                if ((runningServiceInfos.get(j).process.equals("com.google.android.gms")) &&
+                        (runningServiceInfos.get(j).process.equals("com.android.phone")))
                 {
                     flag = 0;
                 }
@@ -275,10 +277,15 @@ public class camera_listener_service extends IntentService {
                 .setAutoCancel(true)
                         //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
                 .setContentTitle("Camera was opened")
+                .setDefaults(Notification.DEFAULT_ALL)
                         //.setContentText(res.getString(R.string.notifytext))
                 .setContentText("Check app: " + packageManager.getApplicationLabel(pack_app.applicationInfo)); // Текст уведомленимя
 
+
         Notification notification = builder.build();
+
+
+
 
         NotificationManager notificationManager = (NotificationManager) getApplicationContext()
                 .getSystemService(Context.NOTIFICATION_SERVICE);

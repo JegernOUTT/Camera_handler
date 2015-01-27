@@ -85,16 +85,20 @@ public class black_list_activity extends Activity  {
         Intent intent = getIntent();
         String app_name = intent.getStringExtra("App_name_add");
 
-        if ((app_name != null))
+
+        if (app_name != null)
         {
             List<String> temp = read_black_file();
             int flag = 0;
-            for (int i = 0; i < temp.size(); i++)
+            if (temp != null)
             {
-                if (temp.get(i).equals(app_name))
+                for (int i = 0; i < temp.size(); i++)
                 {
-                    flag = 1;
-                    Toast.makeText(this, "This application already added", Toast.LENGTH_SHORT).show();
+                    if (temp.get(i).equals(app_name))
+                    {
+                        flag = 1;
+                        Toast.makeText(this, "This application already added", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 

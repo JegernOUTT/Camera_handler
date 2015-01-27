@@ -87,12 +87,15 @@ public class white_list_activity extends Activity {
         {
             List<String> temp = read_white_file();
             int flag = 0;
-            for (int i = 0; i < temp.size(); i++)
+            if (temp != null)
             {
-                if (temp.get(i).equals(app_name))
+                for (int i = 0; i < temp.size(); i++)
                 {
-                    flag = 1;
-                    Toast.makeText(this, "This application already added", Toast.LENGTH_SHORT).show();
+                    if (temp.get(i).equals(app_name))
+                    {
+                        flag = 1;
+                        Toast.makeText(this, "This application already added", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 

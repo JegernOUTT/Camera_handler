@@ -124,7 +124,11 @@ public class toast_pressed_activity extends ActionBarActivity {
         PackageManager packageManager = getPackageManager();
         if (main_pack != null)
         {
-            android.os.Process.killProcess(main_pack.applicationInfo.uid);
+            ActivityManager activityManager = (ActivityManager)this.getSystemService(ACTIVITY_SERVICE);
+
+            activityManager.restartPackage(main_pack.packageName);
+            activityManager.killBackgroundProcesses(main_pack.packageName);
+
             Toast.makeText(getApplicationContext(), "Application " + packageManager.getApplicationLabel(main_pack.applicationInfo) + " is killed!", Toast.LENGTH_SHORT).show();
         } else Toast.makeText(getApplicationContext(), "There is no application to kill", Toast.LENGTH_SHORT).show();
     }
