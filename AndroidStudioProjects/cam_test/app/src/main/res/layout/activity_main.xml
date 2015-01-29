@@ -7,7 +7,6 @@
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:paddingBottom="@dimen/activity_vertical_margin"
                 tools:context="com.example.oit_sergei.KRUGIS.MainActivity"
-                android:nestedScrollingEnabled="false"
                 android:clickable="true">
 
     <LinearLayout
@@ -29,7 +28,17 @@
                 android:text="@string/BLOCK_CAMERA"
                 android:id="@+id/block_cam_btn"
                 android:layout_weight="50"
-                android:onClick="onBlockCameraClick"/>
+                android:onClick="onBlockCameraClick"
+                style="@style/ThemeButton"
+                android:textColor="@drawable/button_text_color"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:minWidth="20dp" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -37,8 +46,16 @@
                 android:text="@string/UNLOCK_CAM"
                 android:id="@+id/unlock_cam_btn"
                 android:layout_weight="50"
-                android:onClick="onUnlockCameraClick" />
+                android:onClick="onUnlockCameraClick"
+                style="@style/ThemeButton"
+                android:textColor="@drawable/button_text_color"
+                android:textStyle="bold"
+                android:textSize="15sp" />
         </LinearLayout>
+
+        <Space
+            android:layout_height="5dp"
+            android:layout_width="0dp" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -51,7 +68,17 @@
                 android:text="@string/BLOCK_MICRO"
                 android:id="@+id/block_micro_btn"
                 android:layout_weight="50"
-                android:onClick="onBlockMicroClick"/>
+                android:onClick="onBlockMicroClick"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="@drawable/button_text_color"
+                style="@style/ThemeButton" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:minWidth="20dp" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -59,7 +86,11 @@
                 android:text="@string/UNLOCK_MIRCO"
                 android:id="@+id/unlock_micro_btn"
                 android:layout_weight="50"
-                android:onClick="onUnlockMicroClick"/>
+                android:onClick="onUnlockMicroClick"
+                style="@style/ThemeButton"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="@drawable/button_text_color" />
         </LinearLayout>
 
         <LinearLayout
@@ -74,7 +105,17 @@
                 android:text="@string/START_CAM"
                 android:id="@+id/start_cam_btn"
                 android:layout_weight="50"
-                android:onClick="onCameraServiceStartClick" />
+                android:onClick="onCameraServiceStartClick"
+                style="@style/ThemeButton"
+                android:textColor="@drawable/button_text_color"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:minWidth="20dp" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -82,8 +123,16 @@
                 android:text="@string/STOP_CAM"
                 android:id="@+id/stop_cam_btn"
                 android:layout_weight="50"
-                android:onClick="onCameraServiceStopClick" />
+                android:onClick="onCameraServiceStopClick"
+                style="@style/ThemeButton"
+                android:textColor="@drawable/button_text_color"
+                android:textSize="15sp"
+                android:textStyle="bold" />
         </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="5dp" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -96,7 +145,17 @@
                 android:text="@string/START_MIC"
                 android:id="@+id/start_mic_btn"
                 android:layout_weight="50"
-                android:onClick="onMicrophoneServiceStartClick"/>
+                android:onClick="onMicrophoneServiceStartClick"
+                style="@style/ThemeButton"
+                android:textColor="@drawable/button_text_color"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:minWidth="20dp" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -104,7 +163,11 @@
                 android:text="@string/STOP_MIC"
                 android:id="@+id/stop_mic_btn"
                 android:layout_weight="50"
-                android:onClick="onMicrophoneServiceStopClick"/>
+                android:onClick="onMicrophoneServiceStopClick"
+                style="@style/ThemeButton"
+                android:textColor="@drawable/button_text_color"
+                android:textSize="15sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
@@ -119,7 +182,17 @@
                 android:text="@string/SHOW_WHITE"
                 android:id="@+id/show_white_btn"
                 android:layout_weight="50"
-                android:onClick="onStartWhiteList"/>
+                android:onClick="onStartWhiteList"
+                style="@style/ThemeButton"
+                android:textColor="@drawable/button_text_color"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:minWidth="20dp" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -127,7 +200,11 @@
                 android:text="@string/SHOW_BLACK"
                 android:id="@+id/show_black_btn"
                 android:layout_weight="50"
-                android:onClick="onStartBlackList"/>
+                android:onClick="onStartBlackList"
+                style="@style/ThemeButton"
+                android:textColor="@drawable/button_text_color"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -137,7 +214,10 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/textView2"
             android:layout_gravity="center_horizontal"
-            android:padding="5dp"/>
+            android:padding="5dp"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@drawable/main_color" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -145,7 +225,10 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/textView3"
             android:layout_gravity="center_horizontal"
-            android:padding="5dp"/>
+            android:padding="5dp"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@drawable/main_color"/>
 
         <Button
             android:layout_width="wrap_content"
@@ -153,7 +236,12 @@
             android:text="@string/update_status"
             android:id="@+id/button"
             android:layout_gravity="center_horizontal"
-            android:onClick="update_services_status"/>
+            android:onClick="update_services_status"
+            style="@style/ThemeButton"
+            android:textColor="@drawable/button_text_color"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:padding="10dp" />
 
     </LinearLayout>
 

@@ -1,5 +1,6 @@
 package com.oit_sergei.KRUGIS.services;
 
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.IntentService;
 import android.app.Notification;
@@ -9,8 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Vibrator;
-import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
 import com.oit_sergei.KRUGIS.MainActivity;
@@ -134,9 +136,9 @@ public class audio_listener_service extends IntentService {
         List <ActivityManager.RunningServiceInfo> runningServiceInfos = activityManager.getRunningServices(Integer.MAX_VALUE);
 
         //Создание контейнеров для отсеяных по microphone permission processes и services
-        List <PackageInfo> packageInfos_running = new ArrayList<>();
-        List <ActivityManager.RunningAppProcessInfo> RunningAppProcessInfo_checked = new ArrayList<>();
-        List <ActivityManager.RunningServiceInfo> runningServiceInfos_checked = new ArrayList<>();
+        List <PackageInfo> packageInfos_running = new ArrayList<PackageInfo>();
+        List <ActivityManager.RunningAppProcessInfo> RunningAppProcessInfo_checked = new ArrayList<ActivityManager.RunningAppProcessInfo>();
+        List <ActivityManager.RunningServiceInfo> runningServiceInfos_checked = new ArrayList<ActivityManager.RunningServiceInfo>();
 
         //Проверка Running Tasks для финального отбора activity
         List <ActivityManager.RunningTaskInfo> runningTaskInfos = activityManager.getRunningTasks(Integer.MAX_VALUE);
@@ -254,6 +256,7 @@ public class audio_listener_service extends IntentService {
     }
 
     private static final int NOTIFY_ID = 102;
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void send_notification(PackageInfo pack_app)
     {
         PackageManager packageManager = getPackageManager();
@@ -262,7 +265,7 @@ public class audio_listener_service extends IntentService {
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notification_intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext());
+        Notification.Builder builder = new Notification.Builder(getApplicationContext());
         builder.setContentIntent(contentIntent)
                 .setSmallIcon(R.drawable.ic_launcher)
 
@@ -271,8 +274,10 @@ public class audio_listener_service extends IntentService {
                 .setAutoCancel(true)
                         //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
                 .setContentTitle("Microphone was opened")
-                .setDefaults(Notification.DEFAULT_ALL)
-                        //.setContentText(res.getString(R.string.notifytext))
+                .setDefaults(Notification.DEFAULT_VIBRATE)
+                .setDefaults(Notification.DEFAULT_LIGHTS)
+                .setSound(Uri.parse("android.resource://"
+                        + this.getPackageName() + "/" + R.raw.microphone_alert))
                 .setContentText("Check app: " + packageManager.getApplicationLabel(pack_app.applicationInfo)); // Текст уведомленимя
 
         Notification notification = builder.build();
@@ -288,7 +293,7 @@ public class audio_listener_service extends IntentService {
         try {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(openFileInput(FILENAME_black)));
             String temp;
-            List<String> black_list = new ArrayList<>();
+            List<String> black_list = new ArrayList<String>();
             while ((temp = bufferedReader.readLine()) != null)
             {
                 black_list.add(temp);
@@ -311,7 +316,7 @@ public class audio_listener_service extends IntentService {
         try {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(openFileInput(FILENAME_white)));
             String temp;
-            List<String> white_list = new ArrayList<>();
+            List<String> white_list = new ArrayList<String>();
             while ((temp = bufferedReader.readLine()) != null)
             {
                 white_list.add(temp);

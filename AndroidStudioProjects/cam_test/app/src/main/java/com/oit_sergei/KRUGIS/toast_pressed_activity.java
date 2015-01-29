@@ -1,5 +1,6 @@
 package com.oit_sergei.KRUGIS;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +11,6 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.oit_sergei.KRUGIS.applications_lists.black_list_activity;
 import com.oit_sergei.KRUGIS.applications_lists.white_list_activity;
 
-public class toast_pressed_activity extends ActionBarActivity {
+public class toast_pressed_activity extends Activity {
 
     private PackageInfo camera_blocked_pack;
     private PackageInfo microphone_blocked_pack;
@@ -44,7 +44,7 @@ public class toast_pressed_activity extends ActionBarActivity {
         if (camera_blocked_pack != null)
         {
             main_pack = camera_blocked_pack;
-            textView.setText("KRUGIS think, that this application: " + packageManager.getApplicationLabel(main_pack.applicationInfo)
+            textView.setText("KRUGIS report, that this application: " + packageManager.getApplicationLabel(main_pack.applicationInfo)
                     + " used your camera");
         }
 
@@ -52,7 +52,7 @@ public class toast_pressed_activity extends ActionBarActivity {
         if (microphone_blocked_pack != null)
         {
             main_pack = microphone_blocked_pack;
-            textView.setText("KRUGIS think, that this application: " + packageManager.getApplicationLabel(main_pack.applicationInfo)
+            textView.setText("KRUGIS report, that this application: " + packageManager.getApplicationLabel(main_pack.applicationInfo)
                 + " used your microphone");
         }
 

@@ -63,7 +63,7 @@ public class black_list_activity extends Activity  {
                                     List<String> black_list_lst = read_black_file();
                                     if (black_list_lst == null)
                                     {
-                                        black_list_lst = new ArrayList<>(1);
+                                        black_list_lst = new ArrayList<String>(1);
                                         black_list_lst.add("No elements");
                                     }
 
@@ -111,7 +111,7 @@ public class black_list_activity extends Activity  {
         List<String> black_list_lst = read_black_file();
         if (black_list_lst == null)
         {
-            black_list_lst = new ArrayList<>(1);
+            black_list_lst = new ArrayList<String>(1);
             black_list_lst.add("No elements");
         }
 
@@ -178,7 +178,7 @@ public class black_list_activity extends Activity  {
         try {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(openFileInput(FILENAME_black)));
             String temp;
-            List<String> black_list = new ArrayList<>();
+            List<String> black_list = new ArrayList<String>();
             while ((temp = bufferedReader.readLine()) != null)
             {
                 black_list.add(temp);

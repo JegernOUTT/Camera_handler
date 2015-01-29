@@ -11,8 +11,13 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <uses-feature android:name="android.hardware.camera" />
+
+    <uses-sdk android:minSdkVersion="14"
+        android:targetSdkVersion="18"
+        android:maxSdkVersion="21" />
 
     android:excludeFromRecents="true"
 
@@ -53,11 +58,14 @@
             android:name=".applications_lists.white_list_activity"
             android:label="@string/title_activity_white_list_activity" >
         </activity>
+        <receiver android:name=".autorun_receiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
 
-        <activity
-            android:name=".applications_lists.SwipeListViewActivity"
-            android:label="@string/title_activity_swipe_list_view" >
-        </activity>
+
+
     </application>
 
 </manifest>

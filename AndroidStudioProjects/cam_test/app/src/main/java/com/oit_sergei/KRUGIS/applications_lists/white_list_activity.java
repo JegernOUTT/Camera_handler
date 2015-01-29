@@ -61,7 +61,7 @@ public class white_list_activity extends Activity {
                                 List<String> black_list_lst = read_white_file();
                                 if (black_list_lst == null)
                                 {
-                                    black_list_lst = new ArrayList<>(1);
+                                    black_list_lst = new ArrayList<String>(1);
                                     black_list_lst.add("No elements");
                                 }
 
@@ -108,7 +108,7 @@ public class white_list_activity extends Activity {
         List<String> white_list_lst = read_white_file();
         if (white_list_lst == null)
         {
-            white_list_lst = new ArrayList<>(1);
+            white_list_lst = new ArrayList<String>(1);
             white_list_lst.add("No elements");
         }
 
@@ -170,7 +170,7 @@ public class white_list_activity extends Activity {
         try {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(openFileInput(FILENAME_white)));
             String temp;
-            List<String> white_list = new ArrayList<>();
+            List<String> white_list = new ArrayList<String>();
             while ((temp = bufferedReader.readLine()) != null)
             {
                 white_list.add(temp);
