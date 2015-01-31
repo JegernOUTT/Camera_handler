@@ -6,11 +6,13 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
@@ -275,17 +277,14 @@ public class camera_listener_service extends IntentService {
                 .setTicker("Camera was opened")
                 .setWhen(System.currentTimeMillis())
                 .setAutoCancel(true)
-                        //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
                 .setContentTitle("Camera was opened")
-                .setDefaults(Notification.DEFAULT_ALL)
-                        //.setContentText(res.getString(R.string.notifytext))
+                .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
+                        + "://" + getPackageName() + "/raw/camera"))
+                .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE)
                 .setContentText("Check app: " + packageManager.getApplicationLabel(pack_app.applicationInfo)); // Текст уведомленимя
 
 
         Notification notification = builder.build();
-
-
-
 
         NotificationManager notificationManager = (NotificationManager) getApplicationContext()
                 .getSystemService(Context.NOTIFICATION_SERVICE);

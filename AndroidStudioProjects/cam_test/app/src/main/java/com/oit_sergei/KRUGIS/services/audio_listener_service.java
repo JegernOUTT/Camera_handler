@@ -1,17 +1,16 @@
 package com.oit_sergei.KRUGIS.services;
 
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Vibrator;
 import android.widget.Toast;
 
@@ -256,7 +255,6 @@ public class audio_listener_service extends IntentService {
     }
 
     private static final int NOTIFY_ID = 102;
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void send_notification(PackageInfo pack_app)
     {
         PackageManager packageManager = getPackageManager();
@@ -274,10 +272,9 @@ public class audio_listener_service extends IntentService {
                 .setAutoCancel(true)
                         //.setContentTitle(res.getString(R.string.notifytitle)) // Заголовок уведомления
                 .setContentTitle("Microphone was opened")
-                .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setDefaults(Notification.DEFAULT_LIGHTS)
-                .setSound(Uri.parse("android.resource://"
-                        + this.getPackageName() + "/" + R.raw.microphone_alert))
+                .setSound(Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
+                        + "://" + getPackageName() + "/raw/microphone"))
+                .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_VIBRATE)
                 .setContentText("Check app: " + packageManager.getApplicationLabel(pack_app.applicationInfo)); // Текст уведомленимя
 
         Notification notification = builder.build();
