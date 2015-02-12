@@ -28,5 +28,7 @@
     <string name="title_activity_files_connect">Files_connect</string>
     <string name="title_activity_swipe_list_view">SwipeListViewActivity</string>
     <string name="update_status">Update services status</string>
+    <string name="title_activity_main_activity2">MainActivity2</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

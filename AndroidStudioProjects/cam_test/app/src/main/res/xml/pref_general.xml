@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:key="time_camera_update"
+        android:title="@string/title_camera"
+        android:defaultValue="@string/default_cam"
+        android:inputType="numberDecimal"
+        android:singleLine="true"
+        android:maxLines="1" />
+
+    <EditTextPreference
+        android:key="time_microphone_update"
+        android:title="@string/title_microphone"
+        android:defaultValue="@string/default_mic"
+        android:inputType="numberDecimal"
+        android:singleLine="true"
+        android:maxLines="1" />
+
+</PreferenceScreen>

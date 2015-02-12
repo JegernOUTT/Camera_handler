@@ -6,6 +6,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.media.AudioFormat;
@@ -13,6 +14,9 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -53,20 +57,52 @@ public class MainActivity extends Activity {
     private Intent intentToFire_camera;
     private Intent intentToFire_microphone;
 
-    long time_camera_update = 500;
-    long time_microphone_update = 1000;
+    static long time_camera_update = 1000;
+    static long time_microphone_update = 2500;
     int alarmType_microphone;
     int alarmType_camera;
 
     static int camera_state = 0;
     static int microphone_state = 0;
+    
+    static int running_flag_camera = 0;
+    static int running_flag_micro = 0;
 
+    static SharedPreferences sp;
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId())
+        {
+            case R.id.action_settings:
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
+        
         is_camera_service_running();
         is_microphone_service_running();
+
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String temp;
+        temp = sp.getString("time_camera_update", "1000");
+        time_camera_update = Integer.parseInt(temp);
+        temp = sp.getString("time_microphone_update", "2500");
+        time_microphone_update = Integer.parseInt(temp);
     }
 
     @Override
@@ -87,22 +123,31 @@ public class MainActivity extends Activity {
 
         is_camera_service_running();
         is_microphone_service_running();
+
+        sp = PreferenceManager.getDefaultSharedPreferences(this);
+        
+        String temp;
+        
+        temp = sp.getString("time_camera_update", "1000");
+        time_camera_update = Integer.parseInt(temp);
+        temp = sp.getString("time_microphone_update", "2500");
+        time_microphone_update = Integer.parseInt(temp);
     }
 
     public void onCameraServiceStartClick(View v)
     {
-        int running_flag = 0;
+        running_flag_camera = 0;
         ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.RunningServiceInfo> runningServiceInfos = activityManager.getRunningServices(Integer.MAX_VALUE);
         for (int i = 0; i < runningServiceInfos.size(); i++)
         {
             if (runningServiceInfos.get(i).service.getClassName().equals("com.oit_sergei.KRUGIS.services.camera_listener_service"))
             {
-                running_flag = 1;
+                running_flag_camera = 1;
             }
         }
 
-        if (running_flag == 0)
+        if (running_flag_camera == 0)
         {
             alarmManager_camera = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             intentToFire_camera = new Intent(getApplicationContext(), camera_listener_service.class);
@@ -174,18 +219,18 @@ public class MainActivity extends Activity {
 
     public void onMicrophoneServiceStartClick(View v)
     {
-        int running_flag = 0;
+        running_flag_micro = 0;
         ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.RunningServiceInfo> runningServiceInfos = activityManager.getRunningServices(Integer.MAX_VALUE);
         for (int i = 0; i < runningServiceInfos.size(); i++)
         {
             if (runningServiceInfos.get(i).service.getClassName().equals("com.oit_sergei.KRUGIS.services.audio_listener_service"))
             {
-                running_flag = 1;
+                running_flag_micro = 1;
             }
         }
 
-        if (running_flag == 0)
+        if (running_flag_micro == 0)
         {
             alarmManager_microphone = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             intentToFire_microphone = new Intent(this, audio_listener_service.class);
@@ -254,7 +299,6 @@ public class MainActivity extends Activity {
         {
             Toast.makeText(getApplicationContext(), "Microphone is already blocked", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     public void onUnlockMicroClick(View v)
